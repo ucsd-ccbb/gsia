@@ -1,0 +1,37 @@
+CCBB © 2018
+
+Package gsia supplies functions described in the paper Wallace et al. 2018, On Entropy and Information in Gene Interaction Networks.
+
+First, install this package in your R by typing from command line, 
+sudo R CMD INSTALL gsia
+Then, start R and type
+library(gsia)
+
+You can start with a small network like this:
+
+df0<-as.data.frame(matrix(c(1,2,2,3,3,4,4,5,5,6,4,7,5,7,3,7,7,6,3,8,8,9,6,10,1,11,2,7,11,13,11,14,11,15,11,16,11,17,11,18,11,19,11,20,19,20,20,21,2,22,6,2,17,8,9,23,23,24,12,24,23,25,25,26,25,27,27,28),ncol=2,byrow=TRUE))
+species<-as.character(1:28)
+g<-graph_from_data_frame(df0,directed=FALSE,vertices=species)
+set.seed(135)
+plot(g,vertex.size=11)
+G<-calculate_G(g)
+
+Now you have a network, g, and correlation matrix G (called \widetilde{G} in the paper)
+
+Define gene sets 
+kA<-c(1,3,8,17)
+kB<-c(2,4,6)
+You can try functions
+tI(kA,G)
+I(kA,kB,G)
+etc.
+
+Or you can start with STRING network right away, by using the STRING graph g_STRING and correlation matrix G_STRING. They will be loaded when they are called (lazy loading). The loading will take several seconds.
+
+entrezA<-c("30","38","158") #The first gene is ACAA1
+entrezB<-c("9054","9061","10376","10427")
+indx<-1:length(V(g_STRING))
+names(indx)<-names(V(g_STRING))
+kA<-indx[entrezA] #convert Entrez into gene indices
+kB<-indx[entrezB]
+I(kA,kB,G_STRING) #mutual information between A and B in the STRING network
