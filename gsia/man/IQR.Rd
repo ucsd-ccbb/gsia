@@ -2,32 +2,34 @@
 % Please edit documentation in R/gsia.R
 \name{IQR}
 \alias{IQR}
-\title{Information quality ratio IQR(kA,kB) of a gene set A and B}
+\title{Information quality ratio IQR(A,B) of gene sets A and B}
 \usage{
-IQR(kA, kB, G)
+IQR(A, B, G)
 }
 \arguments{
-\item{kA}{numeric vector of gene indices in set A}
+\item{A}{numeric or character vector of genes in set A}
 
-\item{kB}{numeric vector of gene indices in set B}
+\item{B}{numeric or character vector of genes in set B}
 
 \item{G}{correlation matrix G}
 }
 \value{
-numeric IQR(kA,kB)
+numeric IQR(A,B)
 }
 \description{
-Information quality ratio IQR(kA,kB) of a gene set A and B
+Information quality ratio IQR(A,B) of gene sets A and B
 }
 \examples{
-indx<-1:length(V(g))
-names(indx)<-as.character(V(g))
-A<-c("1","17","8") #vector of gene names in set A
-kA<-indx[A] #gene indices in set A
-B<-c("1","11") #vector of gene names in set B
-kB<-indx[B] #gene indices in set B
-IQR(kA,kB,G)
+df0<-as.data.frame(matrix(c(1,2,2,3,3,4,4,5,5,6,4,7,5,7,3,7,7,6,3,8,8,9,6,10,1,11,2,7,11,13,11,14,11,15,11,16,11,17,11,18,11,19,11,20,19,20,20,21,2,22,6,2,17,8,9,23,23,24,12,24,23,25,25,26,25,27,27,28,29,30),ncol=2,byrow=TRUE))
+vnames<-as.character(1:30)
+g<-graph_from_data_frame(df0,directed=FALSE,vertices=vnames)
+set.seed(1357)
+plot(g,vertex.size=11)
+G<-get_corr_matrix(g)
+A<-c("2","4","6","30")
+B<-c("21","23","29")
+IQR(A,B,G)
 }
 \seealso{
-""
+\code{\link{tI}} for interaction information, \code{\link{I}} for mutual information, and \code{\link{VI}} for variation of information
 }

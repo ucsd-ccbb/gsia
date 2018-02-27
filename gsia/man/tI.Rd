@@ -2,27 +2,31 @@
 % Please edit documentation in R/gsia.R
 \name{tI}
 \alias{tI}
-\title{Interaction information I(kA) of gene set A}
+\title{Interaction information I(A) of gene set A}
 \usage{
-tI(kA, G)
+tI(A, G)
 }
 \arguments{
-\item{kA}{numeric vector of gene indices in set A}
+\item{A}{numeric or character vector of genes in set A}
 
 \item{G}{correlation matrix G}
 }
 \value{
-numeric I(kA)
+numeric I(A), Eq. (13) of Wallace et al. (2018).
 }
 \description{
-Interaction information I(kA) of gene set A
+Interaction information I(A) of gene set A
 }
 \examples{
-#here we are assuming that matrix G and graph g exist
-A<-c(1,17,8) #vector of gene indices in set A
-names(V(g))[A] # these are the corresponding gene names
-tI(kA,G)
+df0<-as.data.frame(matrix(c(1,2,2,3,3,4,4,5,5,6,4,7,5,7,3,7,7,6,3,8,8,9,6,10,1,11,2,7,11,13,11,14,11,15,11,16,11,17,11,18,11,19,11,20,19,20,20,21,2,22,6,2,17,8,9,23,23,24,12,24,23,25,25,26,25,27,27,28,29,30),ncol=2,byrow=TRUE))
+vnames<-as.character(1:30)
+g<-graph_from_data_frame(df0,directed=FALSE,vertices=vnames)
+set.seed(1357)
+plot(g,vertex.size=11)
+G<-get_corr_matrix(g)
+A<-c("2","4","6","30")
+tI(A,G)
 }
 \seealso{
-""
+\code{\link{I}} for mutual information, \code{\link{VI}} for variation of information, and \code{\link{IQR}} for information quality ratio
 }

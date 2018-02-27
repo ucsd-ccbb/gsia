@@ -2,36 +2,70 @@ CCBB © 2018
 
 Package gsia supplies functions described in the paper Wallace et al. 2018, On Entropy and Information in Gene Interaction Networks.
 
+Dependencies: Matrix, igraph, mygene
+
 First, install this package in your R by typing from command line, 
 sudo R CMD INSTALL gsia
 Then, start R and type
 library(gsia)
 
-You can start with a small network like this:
+These functions are in gsia:
 
-df0<-as.data.frame(matrix(c(1,2,2,3,3,4,4,5,5,6,4,7,5,7,3,7,7,6,3,8,8,9,6,10,1,11,2,7,11,13,11,14,11,15,11,16,11,17,11,18,11,19,11,20,19,20,20,21,2,22,6,2,17,8,9,23,23,24,12,24,23,25,25,26,25,27,27,28),ncol=2,byrow=TRUE))
-species<-as.character(1:28)
-g<-graph_from_data_frame(df0,directed=FALSE,vertices=species)
-set.seed(135)
-plot(g,vertex.size=11)
-G<-calculate_G(g)
+get_STRING
+get_corr_matrix
+get_Iij
+inherit_interactions
+tI
+I
+VI
+IQR
+get_p_tI
+get_p_I
 
-Now you have a network, g, and correlation matrix G (called \widetilde{G} in the paper)
 
-Define gene sets 
-kA<-c(1,3,8,17)
-kB<-c(2,4,6)
-You can try functions
-tI(kA,G)
-I(kA,kB,G)
-etc.
+You can find out about them by typing ?get_STRING etc.
+The examples are executable. For instance, in ?I you will find
 
-Or you can start with STRING network right away, by using the STRING graph g_STRING and correlation matrix G_STRING. They will be loaded when they are called (lazy loading). The loading will take several seconds.
+     df0<-as.data.frame(matrix(c(1,2,2,3,3,4,4,5,5,6,4,7,5,7,3,7,7,6,3,8,8,9,6,10,1,11,2,7,11,13,11,14,11,15,11,16,11,17,11,18,11,19,11,20,19,20,20,21,2,22,6,2,17,8,9,23,23,24,12,24,23,25,25,26,25,27,27,28,29,30),ncol=2,byrow=TRUE))
+     vnames<-as.character(1:30)
+     g<-graph_from_data_frame(df0,directed=FALSE,vertices=vnames)
+     set.seed(1357)
+     plot(g,vertex.size=11)
+     G<-get_corr_matrix(g)
+     A<-c("2","4","6","30")
+     B<-c("21","23","29")
+     I(A,B,G)
 
-entrezA<-c("30","38","158") #The first gene is ACAA1
-entrezB<-c("9054","9061","10376","10427")
-indx<-1:length(V(g_STRING))
-names(indx)<-names(V(g_STRING))
-kA<-indx[entrezA] #convert Entrez into gene indices
-kB<-indx[entrezB]
-I(kA,kB,G_STRING) #mutual information between A and B in the STRING network
+If you want to work with STRING network, you need to create the graph g_STRING and matrix G_STRING as follows:
+
+g_STRING<-get_STRING() #this is for a human. You can get other organisms as well
+
+If you have a tissue-specific gene expression profile, I recommend using the expressed genes to create a tissue-specific graph. Assuming expressed.genes is a character vector containing Entrez gene IDs of expressed genes, you can do that like this:
+
+g<-inherit_interactions(g_STRING,expressed.genes) #some genes may become isolated vertices in this graph
+
+You need to calculate the correlation matrix from your graph:
+
+G<-get_corr_matrix(g)
+
+If you skipped the tissue specific step, you can run this instead: G<-get_corr_matrix(g_STRING)
+
+Now you can iterrogate actual gene sets. For instance, let's say that you want to look at a gene set (Alzheimer's Disease)
+AD<-c("10347","10858","1139","1141","1191","1200","1378","1392","1471","1565","1636","1718","1808","1965","2","2023","2041","2099","2147","22976","23237","23385","23607","23621","2623","26330","267","27328","274","2932","3077","3162","323","3416","3479","348","3480","3481","3482","351","353128","3553","3630","3643","3952","406938","4129","4137","43","4353","450086","4524","4846","4852","498","51338","5328","54209","5468","55676","5621","5649","5663","5664","5697","581","590","596","627","642","64851","6517","6648","6653","7018","7019","7124","7167","7422","7447","7782","780912","801","8081","8301","836","945")
+
+Could AD be a random gene set?
+
+get_p_tI(AD,G) #about 0.003
+
+
+You could add a second gene set (Inflammation):
+
+IN<-c("10019","10544","10747","11221","11277","1137","1141","114131","114548","1241","1280","1395","1401","142","1437","177","183","1906","1947","1958","196","2056","207","2149","2150","2247","2588","2625","2833","284","2920","30009","3146","3162","335","3383","3458","3552","3553","3557","3569","3576","3586","3596","3605","3620","3665","3717","3934","3952","40","4057","406999","407040","41","412","4282","4313","4318","4353","4615","4803","4843","4879","4982","5020","51083","5244","5329","540","54106","5465","5468","54982","55829","5734","5743","6097","623","624","627","6347","6348","6351","6356","6584","6647","6774","6863","7018","7037","7039","7040","7076","7097","7099","7124","7349","7356","7422","7442","7538","796","834","885","8942","8989","916","9311","9370","9373","9536","9948","9966")
+
+get_p_tI(IN,G) #about 0.000
+
+Finally, you can ask if IN is related to AD:
+
+get_p_I(AD,IN,G) #about 0
+
+
