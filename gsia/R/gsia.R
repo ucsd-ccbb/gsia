@@ -79,15 +79,13 @@ get_STRING<-function(species=9606,score=700) {
 #' plot(g,vertex.size=11)
 #' G<-get_corr_matrix(g)
 get_corr_matrix<-function(g) {
-   vnames<-names(V(g))
-   n<-length(V(g))
-   t<-13*(n/14000)^3
+   nv<-length(V(g))
+   t<-6.1*(nv/17171)^3
    if (t>0.1) cat("this will take about ",format(t,digits=2,nsmall=1)," minutes...\n")
    A<-as_adjacency_matrix(g)
-   L<-diag(degree(g)+1)-A
-   CC<-Matrix::tcrossprod(L,L)
-   Ch<-Matrix::Cholesky(CC) #prepare Cholesky decomposition
-   G<-as.matrix(Matrix::solve(Ch,L)) #inverse of L
+   L1<-Diagonal(nv,degree(g)+1)-A
+   Ch<-Cholesky(L1) #prepare Cholesky decomposition
+   G<-as.matrix(Matrix::solve(Ch))
    dG<-diag(G)
    G<-t(G/sqrt(dG))/sqrt(dG) #normalized G
    colnames(G)<-vnames
